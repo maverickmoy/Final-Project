@@ -46,32 +46,56 @@ string preprocessText(const string& text) {
     
     return cleanText;
 }
-// Read training file
-ifstream file("spam.csv"); // Open the CSV file
 
 
 
-// Read test file
-ifstream testFile("email.txt"); // Open the test email file
-string line;
+
+// Function to read test file
+vector<pair<string, string>> emailData; // Vector to store label-message pairs
+void loadTrainingData() {
+    ifstream file("email.txt"); // Open the test file
+    if (!file.is_open()) {
+        cerr << "Error: Unable to open test file." << endl;
+        return; // Exit if the file cannot be opened
+    }
+
+    string line;
+
+    getline(file, line); // Skip header. So we can ignore the first line.
+
+    while (getline(file, line)) { // Read each line
+        // Find the position of the comma
+        size_t commaPos = line.find(',');
+        if (commaPos == string::npos) continue; // Skip if no comma is found
+
+        // Extract label and message
+        string label = line.substr(0, commaPos);
+        string message = line.substr(commaPos + 1);
+
+        // Add the label and message to the vector
+        emailData.push_back(make_pair(label, message));
+    }
+
+    // Close the file
+    file.close();
+}
+
+// Example: Print the stored data
+void printEmailData() {
+    for (const auto& entry : emailData) {
+        cout << "Label: " << entry.first << ", Message: " << entry.second << endl;
+    }
+}
+
+
+
+// Function to read training file
+ifstream testFile("spam.csv"); // Open the spam csv file
 int total = 0, correct = 0;
 
-getline(file, line); // Skip header. So we can ignore the first line.
-
-
-while (getline(file, line)) { // now we are reading each line by line then we can do word by word of each line
-    string label, message; // add vector to store the label and message
-
-    // Use stringstream to parse the line
-    size_t commaPos = line.find(',');
-    if (commaPos == string::npos) continue;
-
-    label = line.substr(0, commaPos);
-    message = line.substr(commaPos + 1);
-
- }
-
  
+
+
 // Identify keywords or patterns often found in spam (e.g., "free", "click", "win").
 vector<string> extractFeatures(const string& text) {
     // v1 use fixed list of spam keywords
@@ -126,12 +150,17 @@ int main() {
 
     // 3. Feature Extraction (keywords, patterns, etc.)
     string preprocessedText = preprocessText(emailContent); 
-    vector<string> features = extractFeatures(preprocessedText); // Extract features from the preprocessed text
+    // 4. Print email data (for debugging)
+    printEmailData();
 
-    // 4. Classification (Regex or ML model)
+    // Extract features from the preprocessed text
+    vector<string> features = extractFeatures(preprocessedText);
+
+    // 5. Classification (Regex or ML model)
     bool isSpam = classifyEmail(features); // Classify the email based on the extracted features
 
-    // 5. Output Result
+
+    // 6. Output Result
     if (isSpam) { 
         cout << "This email is classified as spam." << endl;
     } else {
