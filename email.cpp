@@ -4,8 +4,7 @@
 #include <vector>
 #include <regex> 
 #include <sstream> 
-// #include <mlpack/core.hpp> // Include mlpack library for machine learning
-// #include <mlpack/methods/naive_bayes/naive_bayes_classifier.hpp> // Include decision tree classifier
+
 
 using namespace std;
 
@@ -16,6 +15,11 @@ using namespace std;
 // 3. Extract keywords or patterns often found in spam.
 // 4. Classify the email as spam or ham 
 
+
+// Todo today (4/29/25):
+// add vector to store the label and message
+// write function for training file (spam.csv)
+// finish writing function for test file (email.txt)
 
 
 // Function to read the email content from a file
@@ -42,7 +46,32 @@ string preprocessText(const string& text) {
     
     return cleanText;
 }
+// Read training file
+ifstream file("spam.csv"); // Open the CSV file
 
+
+
+// Read test file
+ifstream testFile("email.txt"); // Open the test email file
+string line;
+int total = 0, correct = 0;
+
+getline(file, line); // Skip header. So we can ignore the first line.
+
+
+while (getline(file, line)) { // now we are reading each line by line then we can do word by word of each line
+    string label, message; // add vector to store the label and message
+
+    // Use stringstream to parse the line
+    size_t commaPos = line.find(',');
+    if (commaPos == string::npos) continue;
+
+    label = line.substr(0, commaPos);
+    message = line.substr(commaPos + 1);
+
+ }
+
+ 
 // Identify keywords or patterns often found in spam (e.g., "free", "click", "win").
 vector<string> extractFeatures(const string& text) {
     // v1 use fixed list of spam keywords
@@ -66,6 +95,8 @@ vector<string> extractFeatures(const string& text) {
 
 }
 
+
+
 // Function to classify the email as spam or ham
 bool classifyEmail(const vector<string>& features) {
     // v1 Simple classification logic.  if more than 2 keywords are found, classify as spam
@@ -77,6 +108,9 @@ bool classifyEmail(const vector<string>& features) {
     // Otherwise, classify as ham
     return false;
 }
+
+
+
 
 int main() { 
     // v1: use list of spam keywords and find 3 or more in the text. Not case sensitive.
